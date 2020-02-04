@@ -2,6 +2,8 @@ autoload colors && colors
 # cheers, @ehrenmurdick
 # http://github.com/ehrenmurdick/config/blob/master/zsh/prompt.zsh
 
+zle_highlight=(default:bold)
+
 if (( $+commands[git] ))
 then
   git="$commands[git]"
@@ -20,9 +22,9 @@ git_dirty() {
   else
     if [[ $($git status --porcelain) == "" ]]
     then
-      echo "on %{$fg_bold[green]%}$(git_prompt_info)%{$reset_color%}"
+      echo "%{$fg_bold[white]%}on%{$reset_color%} %{$fg_bold[green]%}$(git_prompt_info)%{$reset_color%}"
     else
-      echo "on %{$fg_bold[red]%}$(git_prompt_info)%{$reset_color%}"
+      echo "%{$fg_bold[white]%}on%{$reset_color%} %{$fg_bold[red]%}$(git_prompt_info)%{$reset_color%}"
     fi
   fi
 }
@@ -54,6 +56,15 @@ directory_name() {
   echo "%{$fg_bold[cyan]%}%1/%\/%{$reset_color%}"
 }
 
+user_name() {
+  # Highlight the user name when logged in as root.
+  if [[ "${USER}" == "root" ]]; then
+	echo "%{$fg_bold[red]%}%n%{$reset_color%}"
+  else
+	echo "%{$fg_bold[yellow]%}%n%{$reset_color%}"
+  fi;
+}
+
 battery_status() {
   if test ! "$(uname)" = "Darwin"
   then
@@ -66,7 +77,7 @@ battery_status() {
   fi
 }
 
-export PROMPT=$'\n$(battery_status)in $(directory_name) $(git_dirty)$(need_push)\n› '
+export PROMPT=$'\n$(user_name) %{$fg_bold[white]%}at%{$reset_color%} %{$fg_bold[blue]%}%m%{$reset_color%} %{$fg_bold[white]%}in%{$reset_color%} $(directory_name) $(git_dirty)$(need_push)› '
 set_prompt () {
   export RPROMPT="%{$fg_bold[cyan]%}%{$reset_color%}"
 }
